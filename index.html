@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRIDAY AI</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#000;
+    color:white;
+    font-family:Arial, sans-serif;
+    height:100vh;
+    overflow:hidden;
+}
+
+/* TOP BAR */
+
+.topbar{
+    height:70px;
+    background:#050505;
+    border-bottom:1px solid #111;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 18px;
+    position:fixed;
+    top:0;
+    width:100%;
+    z-index:1000;
+}
+
+/* LOGO AREA */
+
+.logo-area{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+/* REALISTIC ARC REACTOR */
+
+.arc-reactor{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    position:relative;
+    background:
+    radial-gradient(circle,
+    #ffffff 0%,
+    #8efcff 15%,
+    #29dfff 35%,
+    #008cff 60%,
+    #001933 100%);
+    
+    box-shadow:
+    0 0 10px #00cfff,
+    0 0 20px #00cfff,
+    0 0 35px #00cfff,
+    0 0 50px #00cfff;
+
+    animation: glow 2s infinite alternate;
+}
+
+/* INNER RINGS */
+
+.arc-reactor::before{
+    content:"";
+    position:absolute;
+    inset:6px;
+    border-radius:50%;
+    border:3px solid rgba(255,255,255,0.8);
+}
+
+.arc-reactor::after{
+    content:"";
+    position:absolute;
+    inset:13px;
+    border-radius:50%;
+    background:white;
+    box-shadow:
+    0 0 12px white,
+    0 0 20px #00e5ff;
+}
+
+@keyframes glow{
+    from{
+        transform:scale(1);
+    }
+    to{
+        transform:scale(1.05);
+    }
+}
+
+.logo-text{
+    font-size:24px;
+    font-weight:bold;
+    letter-spacing:1px;
+}
+
+/* MENU */
+
+.menu-btn{
+    font-size:32px;
+    cursor:pointer;
+    user-select:none;
+}
+
+/* DROPDOWN */
+
+.dropdown{
+    position:fixed;
+    top:70px;
+    right:10px;
+    width:240px;
+    background:#0b0b0b;
+    border:1px solid #1f1f1f;
+    border-radius:18px;
+    display:none;
+    overflow:hidden;
+    z-index:1000;
+    box-shadow:0 0 20px rgba(0,191,255,0.2);
+}
+
+.dropdown button{
+    width:100%;
+    padding:18px;
+    background:none;
+    border:none;
+    color:white;
+    text-align:left;
+    font-size:19px;
+    cursor:pointer;
+    border-bottom:1px solid #151515;
+}
+
+.dropdown button:hover{
+    background:#111;
+}
+
+/* CHAT AREA */
+/* FIXED SCROLLING */
+
+.chat{
+    position:fixed;
+    top:70px;
+    bottom:80px;
+    left:0;
+    right:0;
+
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    padding:18px;
+
+    -webkit-overflow-scrolling:touch;
+}
+
+/* MESSAGES */
+
+.message{
+    max-width:85%;
+    padding:16px;
+    border-radius:18px;
+    margin-bottom:15px;
+    font-size:21px;
+    line-height:1.5;
+    word-wrap:break-word;
+}
+
+.user{
+    margin-left:auto;
+    background:#171717;
+    border:1px solid #303030;
+}
+
+.ai{
+    background:#081421;
+    border:1px solid #0e3d5d;
+}
+
+/* INPUT AREA */
+
+.input-area{
+    position:fixed;
+    bottom:0;
+    width:100%;
+    background:#050505;
+    border-top:1px solid #111;
+    padding:10px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    z-index:999;
+}
+
+/* INPUT */
+
+input{
+    flex:1;
+    background:#101010;
+    border:none;
+    color:white;
+    font-size:22px;
+    padding:16px;
+    border-radius:35px;
+    outline:none;
+}
+
+/* SEND BUTTON */
+
+.send-btn{
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    border:none;
+    background:#00bfff;
+    color:black;
+    font-size:24px;
+    cursor:pointer;
+
+    box-shadow:
+    0 0 10px #00bfff,
+    0 0 20px #00bfff;
+}
+
+.send-btn:hover{
+    background:#29d3ff;
+}
+
+/* POPUPS */
+
+.popup{
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:90%;
+    max-width:400px;
+    background:#0b0b0b;
+    border:1px solid #1d1d1d;
+    border-radius:22px;
+    padding:25px;
+    display:none;
+    z-index:2000;
+
+    box-shadow:
+    0 0 25px rgba(0,191,255,0.25);
+}
+
+.popup h2{
+    margin-bottom:15px;
+    font-size:28px;
+}
+
+.popup p{
+    font-size:20px;
+    line-height:1.6;
+    color:#d9d9d9;
+}
+
+.close-btn{
+    margin-top:20px;
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:14px;
+    background:#00bfff;
+    color:black;
+    font-size:20px;
+    cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- TOP BAR -->
+
+<div class="topbar">
+
+    <div class="logo-area">
+
+        <div class="arc-reactor"></div>
+
+        <div class="logo-text">
+            FRIDAY AI
+        </div>
+
+    </div>
+
+    <div class="menu-btn"
+    onclick="toggleMenu()">
+        ⋮
+    </div>
+
+</div>
+
+<!-- DROPDOWN -->
+
+<div class="dropdown"
+id="dropdown">
+
+    <button onclick="newChat()">
+        🆕 New Chat
+    </button>
+
+    <button onclick="openSettings()">
+        ⚙ Settings
+    </button>
+
+    <button onclick="openAbout()">
+        ℹ About
+    </button>
+
+</div>
+
+<!-- CHAT -->
+
+<div class="chat"
+id="chat"></div>
+
+<!-- INPUT AREA -->
+
+<div class="input-area">
+
+    <input
+    type="text"
+    id="userInput"
+    placeholder="Ask FRIDAY AI anything..."
+    >
+
+    <button class="send-btn"
+    onclick="sendMessage()">
+        ➤
+    </button>
+
+</div>
+
+<!-- ABOUT -->
+
+<div class="popup"
+id="aboutPopup">
+
+    <h2>About FRIDAY AI</h2>
+
+    <p>
+        FRIDAY AI was created by
+        <b>Blessing Masedi</b>
+        in 2026.
+        <br><br>
+
+        Thank you for using this futuristic AI assistant.
+        Your support is appreciated.
+        <br><br>
+
+        Inspired by JARVIS and FRIDAY.
+    </p>
+
+    <button class="close-btn"
+    onclick="closeAbout()">
+        Close
+    </button>
+
+</div>
+
+<!-- SETTINGS -->
+
+<div class="popup"
+id="settingsPopup">
+
+    <h2>Settings</h2>
+
+    <p>
+        Future upgrades:
+        <br><br>
+
+        • Voice Assistant
+        <br>
+        • AI Memory
+        <br>
+        • Themes
+        <br>
+        • Real API Connection
+    </p>
+
+    <button class="close-btn"
+    onclick="closeSettings()">
+        Close
+    </button>
+
+</div>
+
+<script>
+
+/* API KEY */
+
+let apiKey = "";
+
+window.onload = () => {
+
+    apiKey =
+    prompt("Enter your API Key");
+
+    addMessage(
+        "ai",
+        "Welcome back. I am FRIDAY AI. How may I assist you today?"
+    );
+};
+
+/* MENU */
+
+function toggleMenu(){
+
+    let menu =
+    document.getElementById("dropdown");
+
+    if(menu.style.display === "block"){
+        menu.style.display = "none";
+    }else{
+        menu.style.display = "block";
+    }
+}
+
+/* NEW CHAT */
+
+function newChat(){
+
+    document.getElementById("chat").innerHTML = "";
+
+    addMessage(
+        "ai",
+        "New chat started."
+    );
+
+    document.getElementById("dropdown").style.display = "none";
+}
+
+/* SETTINGS */
+
+function openSettings(){
+
+    document.getElementById("settingsPopup")
+    .style.display = "block";
+
+    document.getElementById("dropdown")
+    .style.display = "none";
+}
+
+function closeSettings(){
+
+    document.getElementById("settingsPopup")
+    .style.display = "none";
+}
+
+/* ABOUT */
+
+function openAbout(){
+
+    document.getElementById("aboutPopup")
+    .style.display = "block";
+
+    document.getElementById("dropdown")
+    .style.display = "none";
+}
+
+function closeAbout(){
+
+    document.getElementById("aboutPopup")
+    .style.display = "none";
+}
+
+/* ADD MESSAGE */
+
+function addMessage(type,text){
+
+    let msg =
+    document.createElement("div");
+
+    msg.classList.add("message");
+
+    if(type === "user"){
+        msg.classList.add("user");
+    }else{
+        msg.classList.add("ai");
+    }
+
+    msg.innerText = text;
+
+    document.getElementById("chat")
+    .appendChild(msg);
+
+    /* AUTO SCROLL FIX */
+
+    const chat =
+    document.getElementById("chat");
+
+    chat.scrollTop =
+    chat.scrollHeight;
+}
+
+/* SEND MESSAGE */
+
+function sendMessage(){
+
+    let input =
+    document.getElementById("userInput");
+
+    let text =
+    input.value.trim();
+
+    if(text === "") return;
+
+    addMessage("user",text);
+
+    input.value = "";
+
+    addMessage(
+        "ai",
+        "Thinking..."
+    );
+
+    setTimeout(()=>{
+
+        let aiMessages =
+        document.querySelectorAll(".ai");
+
+        aiMessages[
+        aiMessages.length - 1
+        ].innerText =
+        "This is a demo AI response. Connect your API to make FRIDAY AI fully intelligent.";
+
+    },1200);
+}
+
+/* ENTER KEY */
+
+document
+.getElementById("userInput")
+.addEventListener("keypress",
+function(event){
+
+    if(event.key === "Enter"){
+        sendMessage();
+    }
+});
+
+/* CLOSE MENU OUTSIDE CLICK */
+
+window.onclick = function(event){
+
+    if(
+    !event.target.matches('.menu-btn')
+    ){
+
+        let dropdown =
+        document.getElementById("dropdown");
+
+        if(dropdown.style.display === "block"){
+            dropdown.style.display = "none";
+        }
+    }
+}
+
+</script>
+
+</body>
+</html>
